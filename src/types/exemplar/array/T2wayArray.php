@@ -123,10 +123,19 @@ class T2wayArray extends TArray
 
         if ($keyClass !== null) {
             if (
-                (($isObj = is_object($offset)) && get_class($offset) !== $keyClass)
+                (($isObj = is_object($offset)) && (get_class($offset)) !== $keyClass)
                 || !$isObj && gettype($offset) !== $keyClass
             ) {
-                throw new TException('Invalid key type given.');
+                if (
+                    !$isObj && (
+                        is_subclass_of($keyClass, TCharAbstract::class) && is_string($offset)
+                        || is_subclass_of($keyClass, TInteger::class) && is_int($offset)
+                    )
+                ) {
+                    $offset = new $keyClass($offset);
+                } else {
+                    throw new TException('Invalid key type given.');
+                }
             }
         }
 
